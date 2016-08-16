@@ -1,0 +1,38 @@
+<div id="preview" preview="" debounce="150">
+    <h1><a id="Rollout_On_Premise_Reference_Implementation_0"></a>Rollout On Premise Reference Implementation</h1>
+    <h2><a id="Installation_0"></a>Installation</h2>
+    <p><strong>Install node</strong>
+        Download node.js from <a href="https://nodejs.org/en/download/">https://nodejs.org/en/download/</a> and install on your machine.</p>
+    <p><strong>Clone from git and install dependencies</strong>
+        Clone Rollout’s signer from the following git repository</p>
+    <ul>
+        <li><code>git clone myrepo</code></li>
+        <li><code>cd myrepo</code></li>
+        <li><code>npm install</code> to install all dependecies</li>
+    </ul>
+    <h3><a id="Runing_from_project_root_11"></a>Runing from project root</h3>
+    <p>run:
+        <strong>npm start</strong></p>
+    <h2><a id="Testing_15"></a>Testing</h2>
+    <p><strong>npm test</strong></p>
+    <h2><a id="More_on_the_Signer_18"></a>More on the Signer</h2>
+    <p>The project is a node.js project that use express as the web framework.</p>
+    <ol>
+        <li><code>npm start</code> is actually run app.js which initiate application variables and modules and start the server (in www/bin)</li>
+        <li>app.js register a router (entry point) for all requests that will be <code>http://&lt;this domain&gt;/rollout</code></li>
+        <li>Entry point (in routes/rollout.js)</li>
+        <li>Call for signing configuration send to <code>http://&lt;this domain&gt;/rollout/sign</code> with method=<code>POST</code> and body is:</li>
+    </ol>
+    <pre><code class="language-json">{
+      "data": {
+       //Data that we like to sign with the private key
+      },
+      certificateMd5: 'd1ff47188bb9ffedd3572e8d2322bc7e', //md5 value generated from running md5 on the certificate registered on rollout dashboard. Ususally act as a key to the private key in a local map.
+      callback: "http://localhost:8090/" //The url which you should send the result too.
+    }
+</code></pre>
+    <ol start="5">
+        <li>Signer verify the incoming certificate md5 points to a valid public key (reply with error if not)</li>
+        <li>Signer sign the incoming data and send it to the callback given in the request.</li>
+    </ol>
+</div>
