@@ -28,8 +28,8 @@ The project is a node.js project that use express as the web framework.
       "data": {
        //Data that we like to sign with the private key
       },
-      certificateMd5: 'd1ff47188bb9ffedd3572e8d2322bc7e', //md5 value generated from running md5 on the certificate registered on rollout dashboard. Ususally act as a key to the private key in a local map.
-      callback: "http://localhost:8090/" //The url which you should send the result too.
+      "certificateMd5": "d1ff47188bb9ffedd3572e8d2322bc7e", //md5 value generated from running md5 on the certificate registered on rollout dashboard. Ususally act as a key to the private key in a local map.
+      "callback": "http://localhost:8090/" //The url which you should send the result too.
     }
 ```
 5. Signer verify the incoming certificate md5 points to a valid public key (reply with error if not)
