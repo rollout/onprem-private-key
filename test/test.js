@@ -98,7 +98,7 @@ describe('On premise signer reference implementation', function () {
       body: {
         "data": payloadData,
         "certificateMd5": certificateMd5,
-        "callback": "http://localhost:8090/"
+        "responseURL": "http://localhost:8090/"
       }
     })
       .then(res => {
@@ -123,11 +123,10 @@ describe('On premise signer reference implementation', function () {
       body: {
         "data": payloadData,
         "certificateMd5": certificateMd5,
-        "callback": "http://localhost:8090/"
+        "responseURL": "http://localhost:8090/"
       }
     })
       .then(res => {
-        console.log(`result: ${JSON.stringify(res)}`);
         expect(res[0].statusCode).to.be.equal(403);
         done();
       })

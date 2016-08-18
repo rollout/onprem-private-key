@@ -1,3 +1,9 @@
+'use strict';
+
+/**
+ * This file is the main application startup file. It is where we define application configurations and load the various middleware and routes/
+ */
+
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
@@ -22,7 +28,10 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+//Default route for general stuff (such as welcome page etc')
 app.use('/', routes);
+
+//All requests with prefix 'http://<this domain>/rollout/' will route to module rolloutRoutes for further processing.
 app.use('/rollout', rolloutRoutes);
 
 // catch 404 and forward to error handler

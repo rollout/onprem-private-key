@@ -3,7 +3,10 @@
  */
 'use strict';
 
-//I'm using hardcoded certificate md5 to private keys map. I guess that user would like to put this somewhere else and safe
+/**
+ * I'm using hardcoded certificate md5 to private keys map. I guess that users would like to put this somewhere else and safe
+ */
+
 var keys = {
   'd1ff47188bb9ffedd3572e8d2322bc7e' : {
     value: `-----BEGIN RSA PRIVATE KEY-----

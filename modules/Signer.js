@@ -8,20 +8,26 @@ const NodeRSA = require('node-rsa');
 const request = require('request');
 const privateKeys = require('./privateKeys');
 
+/**
+ * Signer is responsible to sign configurations accorind to the information it gets from the request.
+ */
 class Signer {
   constructor(req) {
-    if (!req || !req.params || !req.body) {
+    if (!req || !req.body) {
       let err = new Error();
       err.message = 'Request is invalid';
       err.code = 400;
       throw err;
     }
-    this.req = req;
     this.data = req.body.data;
     this.certificateMd5 = req.body.certificateMd5;
-    this.callback = req.body.callback;
+    this.responseURL = req.body.responseURL;
   }
   
+  /**
+   * Verify the integrity of the input information. Check that we have data, certificateMd5 and responseUrl
+   * @return { a promise which resolved to empty response on success or error object on failure }
+   */
   verify() {
     var err;
     if (!this.data) {
@@ -31,15 +37,14 @@ class Signer {
       return q.reject(err);
     }
     if (!privateKeys || !this.certificateMd5 || !privateKeys[this.certificateMd5]) {
-      console.log(privateKeys[this.certificateMd5]);
       err = new Error();
       err.message = 'Certificate is not valid';
       err.code = 403;
       return q.reject(err);
     }
-    if (!this.callback) {
+    if (!this.responseURL) {
       err = new Error();
-      err.message = 'Callback is missing';
+      err.message = 'responseURL is missing';
       err.code = 400;
       return q.reject(err);
     }
@@ -47,6 +52,12 @@ class Signer {
     return q.resolve();
   }
   
+  /**
+   * Sign the configuration with the private key corresponds to the certificateMd5.
+   * Call to send the signature once the signing is done.
+   * If you need to do some other actions before signing (for example update some git), this is one place to do it.
+   * @return { a promise which is resolved as empty response on success }
+   */
   sign() {
     let keyInfo = privateKeys[this.certificateMd5];
     if (!keyInfo.nodeRSAObj) {
@@ -57,32 +68,40 @@ class Signer {
       });
     }
     
-    var signature = keyInfo.nodeRSAObj.sign(this.data, 'base64');
-    sendSignature(signature, this.certificateMd5, this.callback);
+    try {
+      this.signature = keyInfo.nodeRSAObj.sign(this.data, 'base64');
+      this.sendSignature();
+    } catch (e) {
+      return q.reject(e);
+    }
     
     return q.resolve();
   }
-}
-
-/******************** Private functions ***********************/
-function sendSignature(signature, certificateMd5, url) {
-  let responseJson = {
-    signature: signature,
-    certificateMd5: certificateMd5
-  };
-  q.nfcall(request, {
-    uri: url,
-    method: 'POST',
-    json: true,
-    body: responseJson
-  })
-    .then(res => {
-      console.log(res.statusCode);
+  
+  /**
+   * Send the resulted signed configuration (this.signature) to the given responseURL
+   */
+  sendSignature() {
+    let responseJson = {
+      signature: this.signature,
+      certificateMd5: this.certificateMd5
+    };
+    q.nfcall(request, {
+      uri: this.responseURL,
+      method: 'POST',
+      json: true,
+      body: responseJson
     })
-    .catch(err => {
-      console.error(err);
-    })
-    .done();
+      .then(res => {
+        res = res.length ? res[0] : res;
+        console.log(`configuration response status: ${res.statusCode}`);
+      })
+      .catch(err => {
+        err = err || `failed to send signed configuration to ${this.responseURL}`;
+        console.error(err);
+      })
+      .done();
+  }
 }
 
 module.exports = Signer;
