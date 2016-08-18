@@ -37,3 +37,12 @@ The project is a node.js project that use express as the web framework.
 
 1. Signer verify the incoming certificate md5 points to a valid public key (reply with error if not)
 1. Signer sign the incoming data and send it to the callback given in the request.
+
+### Create private key and Certificate
+You can create private key and certificate in one line using openssl
+
+ - run the command: `openssl req  -nodes -new -x509  -keyout private_key.pem -out certificate.cert`
+ - Answer the questions on the command prompt for generating the certificate.
+ 
+On complete you should have private key in `private_key.pem` and certificate ready in `certificate.cert`
+Please note that when loading certificate to Rollout dashboard you should omit the certificate header and footer (e.g. `-----BEGIN CERTIFICATE-----` and `-----END CERTIFICATE-----`)
