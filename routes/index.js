@@ -7,7 +7,6 @@ var fs = require('fs');
 var path = require('path');
 var q = require('q');
 
-var readme;
 /**
  * Lending page for this tool that represent the README.md
  */
@@ -15,7 +14,7 @@ router.get('/', function(req, res, next) {
   let p = path.resolve('README.md');
   q.nfcall(fs.readFile, p, 'utf8')
     .then( content => {
-      readme = markdown.makeHtml(content);
+      let readme = markdown.makeHtml(content);
       res.send(readme);
     })
     .catch(err => {
