@@ -38,6 +38,33 @@ The project is a node.js project that use express as the web framework.
 1. Signer verify the incoming certificate md5 points to a valid public key (reply with error if not)
 1. Signer sign the incoming data and send it to the callback given in the request.
 
+### Project structure
+```c
+|-- bin
+|   `-- www // execution script
+|-- modules
+|   |-- privateKeys.js //  private key moddule data 
+|   `-- signer.js //  sign configurations accorind to the information it gets from the request.
+|-- public
+|   `-- stylesheets
+|       `-- style.css 
+|-- routes
+|   |-- index.js // registers handler for showing the markup file on route /
+|   `-- rollout.js // register handler that sign data and send back to responseURL on route /sign
+|-- test
+|   |-- res
+|   |   |-- certificateMd5 
+|   |   |-- server.cert
+|   |   `-- server.pem
+|   `-- test.js
+|-- views 
+|   |-- error.hbs
+|   |-- index.hbs
+|   `-- layout.hbs
+|-- README.md
+|-- app.js // define application configurations and load the various middleware and routes
+`-- package.json //  node dependencies test and start scripts
+```
 ### Create private key and Certificate
 You can create private key and certificate in one line using openssl
 
