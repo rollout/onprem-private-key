@@ -6,10 +6,11 @@
 const q = require('q');
 const NodeRSA = require('node-rsa');
 const request = require('request');
-const privateKeys = require('./privateKeys');
+const fs = require('fs');
+const path = require('path');
 
 /**
- * Signer is responsible to sign configurations accorind to the information it gets from the request.
+ * Signer is responsible to sign configurations according to the information it gets from the request.
  */
 class Signer {
   constructor(req) {
@@ -36,46 +37,66 @@ class Signer {
       err.code = 400;
       return q.reject(err);
     }
-    if (!privateKeys || !this.certificateMd5 || !privateKeys[this.certificateMd5]) {
-      err = new Error();
-      err.message = 'Certificate is not valid';
-      err.code = 403;
-      return q.reject(err);
-    }
+  
     if (!this.responseURL) {
       err = new Error();
       err.message = 'responseURL is missing';
       err.code = 400;
       return q.reject(err);
     }
-    
+  
+    if (!this.certificateMd5) {
+      let err = new Error();
+      err.message = 'certificateMd5 is missing';
+      err.code = 400;
+      return q.reject(err);
+    }
     return q.resolve();
+  }
+  
+  /**
+   * Load the private key correponds to the given certificateMd5.
+   * @return {*}
+   */
+  loadArtifacts(){
+    return q.nfcall(fs.readFile, path.resolve(`./keys/${this.certificateMd5}/private.pem`), 'utf8')
+      .then(privateKeyData => {
+        this.privateKeyData = privateKeyData;
+      })
+      .catch(err => {
+        if( err.code === 'ENOENT'){
+          let err = new Error();
+          err.message = `Cannot find private key for certificateMd5: ${this.certificateMd5}`;
+          err.code = 404;
+          return q.reject(err);
+        }
+      });
   }
   
   /**
    * Sign the configuration with the private key corresponds to the certificateMd5.
    * Call to send the signature once the signing is done.
-   * If you need to do some other actions before signing (for example update some git), this is one place to do it.
+   * If you need to do some other actions before signing (for example update some git or store in db), this is one place to do it.
    * @return { a promise which is resolved as empty response on success }
    */
   sign() {
-    let keyInfo = privateKeys[this.certificateMd5];
-    if (!keyInfo.nodeRSAObj) {
-      console.log(`Creating nodeRSA obj`);
-      keyInfo.nodeRSAObj = new NodeRSA(keyInfo.value, {
-        environment: 'node',
-        signingAlgorithm: 'sha256'
-      });
-    }
-    
-    try {
-      this.signature = keyInfo.nodeRSAObj.sign(this.data, 'base64');
-      this.sendSignature();
-    } catch (e) {
-      return q.reject(e);
-    }
-    
-    return q.resolve();
+    return this.preSignHook()
+      .then( () => {
+        console.log(`Creating nodeRSA obj`);
+        let nodeRSAObj = new NodeRSA(this.privateKeyData, {
+          environment: 'node',
+          signingAlgorithm: 'sha256'
+        });
+  
+        try {
+          console.log(`Signing data: ${this.data}`);
+          this.signature = nodeRSAObj.sign(this.data, 'base64');
+          this.sendSignature();
+        } catch (e) {
+          return q.reject(e);
+        }
+      })
+      .then(this.postSignHook.bind(this));
   }
   
   /**
@@ -101,6 +122,24 @@ class Signer {
         console.error(err);
       })
       .done();
+  }
+  
+  /**
+   * Replace this empty implementation with some pre signing actions and logic that you would like to do.
+   * @return promise that is resolved immediately
+   */
+  preSignHook() {
+    console.log('Pre signing hook logic here');
+    return q.resolve();
+  }
+  
+  /**
+   * Replace this empty implementation with some post signing actions and logic that you would like to do.
+   * @return promise that is resolved immediately
+   */
+  postSignHook() {
+    console.log('Post signing hook logic here');
+    return q.resolve();
   }
 }
 

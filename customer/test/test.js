@@ -4,12 +4,13 @@
 'use strict';
 
 const http = require('http');
+const path = require('path');
+const fs = require('fs');
 const q = require('q');
 const chai = require('chai');
 const request = require('request');
 const expect = chai.expect;
 const NodeRSA = require('node-rsa');
-const privateKeys = require('../modules/privateKeys');
 
 /************************** Privates & Utils **************************/
 var _handleRequest = function (headers, rawBody) {
@@ -71,12 +72,14 @@ describe('On premise signer reference implementation', function () {
   });
   
   it('expect remote signer to reply with valid signed object', function (done) {
-    var certificateMd5 = "d1ff47188bb9ffedd3572e8d2322bc7e";
+    var certificateMd5 = "535110d5fb598c7a01635d108ab69e54";
     var payloadData = {
       "one": 1,
       "two": 2
     };
-    var nodeRSAInstance = new NodeRSA(privateKeys[certificateMd5].value, {
+    var privatePem = path.resolve('./keys/535110d5fb598c7a01635d108ab69e54/private.pem');
+    var privateKey = fs.readFileSync(privatePem, 'utf8');
+    var nodeRSAInstance = new NodeRSA(privateKey, {
       environment: 'node',
       signingAlgorithm: 'sha256'
     });
@@ -109,7 +112,7 @@ describe('On premise signer reference implementation', function () {
       .done();
   });
   
-  it('expect remote signer to reply with 403 certificateMd5 is not valid', function (done) {
+  it('expect remote signer to reply with 404 "Cannot find private key for certificateMd5"', function (done) {
     var certificateMd5 = "other";
     var payloadData = {
       "one": 1,
@@ -127,7 +130,7 @@ describe('On premise signer reference implementation', function () {
       }
     })
       .then(res => {
-        expect(res[0].statusCode).to.be.equal(403);
+        expect(res[0].statusCode).to.be.equal(404);
         done();
       })
       .catch(err => {

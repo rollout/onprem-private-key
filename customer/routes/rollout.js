@@ -21,6 +21,7 @@ const Signer = require('../modules/signer');
 router.post('/sign', (req, res) => {
   let signer = new Signer(req);
   signer.verify()
+    .then(signer.loadArtifacts.bind(signer))
     .then(()=> {
       //Note that this response is just to tell the caller that request received and validated. The actual signed data will be sent via the responseUrl callback
       res.status(200).send();
