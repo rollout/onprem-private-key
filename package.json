@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www",
-    "test": "Q_DEBUG=1 mocha test/*"
+    "start": "node ./customer/bin/www",
+    "test": "Q_DEBUG=1 mocha customer/test/*"
   },
   "dependencies": {
     "body-parser": "~1.13.2",
