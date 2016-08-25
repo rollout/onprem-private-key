@@ -8,16 +8,7 @@ const express = require('express');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const NodeRSA = require('node-rsa');
-const RolloutMock = require('./RolloutMock');
-
-const app = express();
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
-
-var signingEndpoint = process.argv[2];
-var certificateFilePath = process.argv[3];
-var rolloutMock = new RolloutMock(signingEndpoint, certificateFilePath);
+const RolloutMock = require('./rolloutMock');
 
 if (process.argv.length !== 4) {
   console.log(`Usage: node simulate_rollout_signing_request.js  <signing_endpoint> <certificate_file>
@@ -28,6 +19,17 @@ if (process.argv.length !== 4) {
   console.log(`Running Rollout mock with signing url: "${signingEndpoint}"
    path to certificate: "${certificateFilePath}"`)
 }
+
+const app = express();
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser());
+
+var signingEndpoint = process.argv[2];
+var certificateFilePath = process.argv[3];
+var rolloutMock = new RolloutMock(signingEndpoint, certificateFilePath);
+
+
 
 /**
  * This is the routes that is used as the responseURL in this demo.
