@@ -9,6 +9,10 @@ const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const NodeRSA = require('node-rsa');
 const RolloutMock = require('./rolloutMock');
+const prettyjson = require('prettyjson');
+
+const signingEndpoint = process.argv[2];
+const certificateFilePath = process.argv[3];
 
 if (process.argv.length !== 4) {
   console.log(`Usage: node simulate_rollout_signing_request.js  <signing_endpoint> <certificate_file>
@@ -25,8 +29,6 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-var signingEndpoint = process.argv[2];
-var certificateFilePath = process.argv[3];
 var rolloutMock = new RolloutMock(signingEndpoint, certificateFilePath);
 
 
@@ -36,7 +38,7 @@ var rolloutMock = new RolloutMock(signingEndpoint, certificateFilePath);
  * The remote signer must send the signed configuration to this endpoint.
  */
 app.post('/api/app-versions/12345678/signing_data/987654', function (req, res) {
-  console.log(`Got response from remote signer with body: ${JSON.stringify(req.body)}`);
+  console.log(`Got response from remote signer with body: ${prettyjson.render(req.body)}`);
   let key = new NodeRSA(rolloutMock.publicKeyData, {
     environment: 'node',
     signingAlgorithm: 'sha256'
@@ -45,12 +47,14 @@ app.post('/api/app-versions/12345678/signing_data/987654', function (req, res) {
   //Note that we are verifing the signature with the raw data we have sent.
   if(key.verify(rolloutMock.body.data, req.body.signature, 'base64', 'base64')){
     console.log(`----------------------  Success verification ----------------------
-    Signature: ${req.body.signature} is verified with data: ${JSON.stringify(rolloutMock.body.data)}`);
+    Signature: \n ${prettyjson.render(req.body.signature)}
+      is verified with data: \n ${prettyjson.render(rolloutMock.body.data)}`);
     res.status(200).send();
     process.exit(0);
   } else {
     console.log(`---------------------- Failed verification ----------------------
-    Failed to verify signature: ${req.body.signature} with data: ${JSON.stringify(rolloutMock.body.data)}`);
+    Failed to verify signature: \n${req.body.signature} 
+      with data: \n ${JSON.stringify(rolloutMock.body.data)}`);
     res.status(400).send();
     process.exit(1);
   }
