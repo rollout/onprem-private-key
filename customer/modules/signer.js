@@ -82,14 +82,13 @@ class Signer {
   sign() {
     return this.preSignHook()
       .then( () => {
-        console.log(`Creating nodeRSA obj`);
+        console.log(`Creating nodeRSA obj with signingAlgorithm sha256`);
         let nodeRSAObj = new NodeRSA(this.privateKeyData, {
           environment: 'node',
           signingAlgorithm: 'sha256'
         });
   
         try {
-          console.log(`Signing data: ${this.data}`);
           this.signature = nodeRSAObj.sign(this.data, 'base64');
           this.sendSignature();
         } catch (e) {
@@ -103,9 +102,11 @@ class Signer {
    * Send the resulted signed configuration (this.signature) to the given responseURL
    */
   sendSignature() {
+    console.log(`sending data to ${this.responseURL} with signature ${this.signature}`);
     let responseJson = {
       signature: this.signature,
-      certificateMd5: this.certificateMd5
+      certificateMd5: this.certificateMd5,
+      data: this.data
     };
     q.nfcall(request, {
       uri: this.responseURL,
@@ -115,7 +116,7 @@ class Signer {
     })
       .then(res => {
         res = res.length ? res[0] : res;
-        console.log(`configuration response status: ${res.statusCode}`);
+        console.log(`sent data to ${this.responseURL} configuration response status: ${res.statusCode}`);
       })
       .catch(err => {
         err = err || `failed to send signed configuration to ${this.responseURL}`;

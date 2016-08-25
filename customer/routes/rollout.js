@@ -25,7 +25,7 @@ router.post('/sign', (req, res) => {
     .then(()=> {
       //Note that this response is just to tell the caller that request received and validated. The actual signed data will be sent via the responseUrl callback
       res.status(200).send();
-      console.log(`Received valid data to sign: ${JSON.stringify(req.body)}`);
+      console.log(`Received data pending signature at responseURL: ${req.body.responseURL} with certificate (md5): ${req.body.certificateMd5}`);
     })
     .then(signer.sign.bind(signer))
     .catch( err => {
