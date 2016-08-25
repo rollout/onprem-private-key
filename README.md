@@ -19,7 +19,7 @@ $ npm start
   Runs Rollout's customer code which is the signing remote service
  
 ```bash 
-$ node simulate_rollout_signing_request.js http://localhost:4000/rollout/sign ../keys/535110d5fb598c7a01635d108ab69e54/certificate.cert
+$ node rollout/simulate_rollout_signing_request.js http://localhost:4000/rollout/sign ./keys/535110d5fb598c7a01635d108ab69e54/certificate.cert // or npm run simulate
 ```
 
  Runs Rollout's mock which send sample configuration to remote signing url with the given certificate. 
