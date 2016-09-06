@@ -6,6 +6,8 @@ The on premise private key feature allows Rollout customer to hold their own asy
 
 More about Rollout security can be found here: https://rollout.io/security/
 
+This project is a reference implementation for the on premise entity, it opens an endpoint ready for signning and responde to Rollout server signing request
+
 ## Installation
 
 **Install node**
