@@ -1,4 +1,11 @@
 # Rollout On Premise Reference Implementation
+## Overview 
+Rollout point to point security from cloud to devices is built on asymmetric key pair, the SDK gets bundled with a self signed certificate that contains a public key, that public key is extracted from the certificate on runtime and is used to verify that the data was signed with Rollout's private key stored safely on Rollout cloud (via aws).
+
+The on premise private key feature allows Rollout customer to hold their own asymmetric key pair that will be used for the security mechanism, this way only server holding the private key (on premised) can sign the hot patches. 
+
+More about Rollout security can be found here: https://rollout.io/security/
+
 ## Installation
 
 **Install node**
