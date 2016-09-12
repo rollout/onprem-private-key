@@ -15,8 +15,8 @@ Download node.js from https://nodejs.org/en/download/ and install on your machin
 
 **Clone from git and install dependencies**
 Clone Rollout's signer from the following git repository
- - `git clone https://github.com/rollout/node-rsa-signer.git`
- - `cd node-rsa-signer`
+ - `git clone https://github.com/rollout/onprem-private-key-reference-implementation.git`
+ - `cd onprem-private-key-reference-implementation`
  - `npm install` to install all dependecies
 
 ### Quick start 
