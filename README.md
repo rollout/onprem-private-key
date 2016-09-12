@@ -99,7 +99,7 @@ The project is a node.js project that use express as the web framework.
 |-- README.md // This file
 `-- package.json //  node dependencies test and start scripts
 ```
-### Create private key, Certificate and public key
+### Create private key and Certificate
 You can create private key and certificate in one line using openssl
 
  - run the command: `openssl req  -nodes -new -x509  -keyout private_key.pem -out certificate.cert`
@@ -107,7 +107,3 @@ You can create private key and certificate in one line using openssl
 
 On complete you should have private key in `private_key.pem` and certificate ready in `certificate.cert`
 Please note that when loading certificate to Rollout dashboard you should omit the certificate header and footer (e.g. `-----BEGIN CERTIFICATE-----` and `-----END CERTIFICATE-----`)
-
-You can generate the public key correspond to your certificate using openssl
-
- - run the command: `openssl x509 -inform pem -in certificate.cert -pubkey -noout > public.pem`
