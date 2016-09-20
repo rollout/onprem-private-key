@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+'use strict';
 
 /**
  * Module dependencies.
@@ -18,6 +19,7 @@ app.set('port', port);
  * Create HTTP server.
  */
 
+var isReady = false;
 var server = http.createServer(app);
 
 /**
@@ -27,6 +29,8 @@ var server = http.createServer(app);
 server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
+server.on('connection', () => isReady = true);
+server.on('close', () => isReady = false);
 
 /**
  * Normalize a port into a number, string, or false.
@@ -87,3 +91,9 @@ function onListening() {
     : 'port ' + addr.port;
   console.log('Listening on ' + bind);
 }
+
+module.exports = {
+  service: app,
+  server: server,
+  isReady: isReady;
+};
