@@ -5,7 +5,7 @@
  * Module dependencies.
  */
 
-const eventEmitter = require('./modules/roEventEmitter');
+const eventEmitter = require('../modules/roEventEmitter');
 const app = require('../app');
 const http = require('http');
 
