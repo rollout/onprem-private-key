@@ -5,8 +5,9 @@
  * Module dependencies.
  */
 
-var app = require('../app');
-var http = require('http');
+const eventEmitter = require('./modules/roEventEmitter');
+const app = require('../app');
+const http = require('http');
 
 /**
  * Get port from environment and store in Express.
@@ -29,7 +30,11 @@ var server = http.createServer(app);
 server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
-server.on('connection', () => isReady = true);
+server.on('connection', () => {
+  isReady = true;
+  eventEmitter.emit('service_ready');
+});
+
 server.on('close', () => isReady = false);
 
 /**
@@ -95,5 +100,6 @@ function onListening() {
 module.exports = {
   service: app,
   server: server,
-  isReady: isReady
+  isReady: isReady,
+  eventEmitter: eventEmitter
 };

@@ -10,6 +10,7 @@ const favicon = require('serve-favicon');
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
+const eventEmitter = require('./modules/roEventEmitter');
 
 const routes = require('./routes');
 const rolloutRoutes = require('./routes/rollout');

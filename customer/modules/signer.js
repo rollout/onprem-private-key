@@ -8,6 +8,7 @@ const NodeRSA = require('node-rsa');
 const request = require('request');
 const fs = require('fs');
 const path = require('path');
+const eventEmitter = require('./roEventEmitter');
 
 /**
  * Signer is responsible to sign configurations according to the information it gets from the request.
@@ -131,6 +132,11 @@ class Signer {
    */
   preSignHook() {
     console.log('Pre signing hook logic here');
+    eventEmitter.emit('pre_signing', {
+      data : this.data,
+      certificateMd5: this.certificateMd5,
+      responseURL : this.responseURL
+    });
     return q.resolve();
   }
   
@@ -140,6 +146,12 @@ class Signer {
    */
   postSignHook() {
     console.log('Post signing hook logic here');
+    eventEmitter.emit('post_signing', {
+      data : this.data,
+      certificateMd5: this.certificateMd5,
+      responseURL : this.responseURL,
+      signature: this.signature
+    });
     return q.resolve();
   }
 }
