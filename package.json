@@ -1,12 +1,13 @@
 {
   "name": "node-rsa-signer",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": true,
   "scripts": {
     "start": "node ./customer/bin/www",
     "simulate": "node ./rollout/simulate_rollout_signing_request.js http://localhost:4000/rollout/sign ./keys/535110d5fb598c7a01635d108ab69e54/certificate.cert",
     "test": "Q_DEBUG=1 mocha customer/test/*"
   },
+  "main": "customer/app.js",
   "dependencies": {
     "body-parser": "~1.13.2",
     "cookie-parser": "~1.3.5",
