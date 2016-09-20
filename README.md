@@ -45,7 +45,7 @@ $ npm test
 The project is a node.js project that use express as the web framework.
 
 1. `npm start` is actually run customer/app.js which initiate application variables and modules and start the server (in customer/www/bin)
-1. customer/app.js register a router (entry point) for all requests that will be `http://<this domain>/rollout`
+1. customer/app.js register a router (entry point) for all requests that will start with `http://<this domain>/rollout`
 1. Entry point (in customer/routes/rollout.js) 
 1. Call for signing configuration send to `http://<this domain>/rollout/sign` with method=`POST` and body is: 
 
@@ -61,6 +61,11 @@ The project is a node.js project that use express as the web framework.
 
 1. Signer verify the incoming certificate md5 points to a valid public key (reply with error if not)
 1. Signer sign the incoming data and send it to the responseURL given in the request.
+
+``Note:`` 
+In case you just want to see the result of your signed data sent to mocked rollout server you may provide the following responseUrl:
+`http://<this domain>/rollout/dummyRollout/app-versions/:appId/signing_data/:transactionId` with method=`POST` and body as you expect to send to rollout.
+ `:appId` and `:transactionId` are provided by rollout (and you may provide them with arbitrary values).
 
 ### Project structure
 ```c

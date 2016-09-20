@@ -95,5 +95,5 @@ function onListening() {
 module.exports = {
   service: app,
   server: server,
-  isReady: isReady;
+  isReady: isReady
 };

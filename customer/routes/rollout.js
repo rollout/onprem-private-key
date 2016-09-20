@@ -5,6 +5,7 @@
 
 const express = require('express');
 const router = express.Router();
+const prettyJson = require('prettyjson');
 
 const Signer = require('../modules/signer');
 
@@ -36,6 +37,15 @@ router.post('/sign', (req, res) => {
       console.error(`Error while signing configuration. Code= ${err.code}, Message=${err.message}`);
     })
     .done();
+});
+
+router.post('/dummyRollout/app-versions/:appId/signing_data/:transactionId', (req, res) => {
+  console.log(prettyJson.render({
+    appId: req.params.appId,
+    transactionId: req.params.transactionId
+  }));
+  console.log(prettyJson.render(req.body));
+  res.status(200).send();
 });
 
 /**
