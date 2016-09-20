@@ -63,9 +63,10 @@ The project is a node.js project that use express as the web framework.
 1. Signer sign the incoming data and send it to the responseURL given in the request.
 
 ``Note:`` 
-In case you just want to see the result of your signed data sent to mocked rollout server you may provide the following responseUrl:
+In case you just want to test the result of your signed data sent to mocked rollout server you may provide the following responseUrl:
 `http://<this domain>/rollout/dummyRollout/app-versions/:appId/signing_data/:transactionId` with method=`POST` and body as you expect to send to rollout.
  `:appId` and `:transactionId` are provided by rollout (and you may provide them with arbitrary values).
+ The result (with this endpoint) will be shown on the console.
 
 ### Project structure
 ```c
