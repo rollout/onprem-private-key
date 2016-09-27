@@ -60,7 +60,7 @@ class Signer {
    * @return {*}
    */
   loadArtifacts(){
-    return q.nfcall(fs.readFile, path.resolve(`./keys/${this.certificateMd5}/private.pem`), 'utf8')
+    return q.nfcall(fs.readFile, path.resolve(`../keys/${this.certificateMd5}/private.pem`), 'utf8')
       .then(privateKeyData => {
         this.privateKeyData = privateKeyData;
       })
@@ -109,11 +109,12 @@ class Signer {
       certificateMd5: this.certificateMd5,
       data: this.data
     };
-    q.nfcall(request, {
+    return q.nfcall(request, {
       uri: this.responseURL,
       method: 'POST',
       json: true,
-      body: responseJson
+      body: responseJson,
+      rejectUnauthorized: false
     })
       .then(res => {
         res = res.length ? res[0] : res;
@@ -122,8 +123,7 @@ class Signer {
       .catch(err => {
         err = err || `failed to send signed configuration to ${this.responseURL}`;
         console.error(err);
-      })
-      .done();
+      });
   }
   
   /**
