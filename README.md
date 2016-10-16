@@ -1,12 +1,12 @@
 # Rollout On Premise Reference Implementation
 ## Overview 
-Rollout point to point security from cloud to devices is built on asymmetric key pair, the SDK gets bundled with a self signed certificate that contains a public key, that public key is extracted from the certificate on runtime and is used to verify that the data was signed with Rollout's private key stored safely on Rollout cloud (via aws).
+Rollout's patching process for live native iOS apps involves downloading patches from the cloud to mobile devices. To ensure the autenticity of patches Rollout incoporates a security mechanism which is built upon asymmetric key pairs (private / public keys). Rollout's SDK is bundled with a certificate that contains a public key (which is extracted at runtime) to verify that the patch was signed with the corresponding private key.
 
-The on premise private key feature allows Rollout customer to hold their own asymmetric key pair that will be used for the security mechanism, this way only server holding the private key (on premised) can sign the hot patches. 
+For increased security, Rollout's on-premise private key feature allows enterpsie customers to use their own public/private key pair instead of Rollout's own keys. This means only the client can sign patches before they are pushed to live devices. This also gives the client full control of the approval process to realse a patch to live devices.
 
-More about Rollout security can be found here: https://rollout.io/security/
+More about Rollout's security can be found here: https://rollout.io/security/
 
-This project is a reference implementation for the on premise entity, it opens an endpoint ready for signning and responde to Rollout server signing request
+This project provides a reference implementation for the on-premise signing service a client needs to install to support signing patches with their own keys. It creates an endpoint for responding to a request from Rollout's servers to sign a patch and release it to production.
 
 ## Installation
 
