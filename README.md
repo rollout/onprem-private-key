@@ -108,8 +108,8 @@ In case you just want to test the result of your signed data sent to mocked roll
 ### Create private key and Certificate
 You can create private key and certificate in one line using openssl
 
- - run the command: `openssl req  -nodes -new -x509  -keyout private_key.pem -out certificate.cert`
+ - run the command: `openssl req  -nodes -new -x509  -keyout private.pem -out certificate.cert`
  - Answer the questions on the command prompt for generating the certificate.
 
-On complete you should have private key in `private_key.pem` and certificate ready in `certificate.cert`
+On complete you should have private key in `private.pem` and certificate ready in `certificate.cert`
 Please note that when loading certificate to Rollout dashboard you should omit the certificate header and footer (e.g. `-----BEGIN CERTIFICATE-----` and `-----END CERTIFICATE-----`)
