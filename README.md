@@ -108,12 +108,26 @@ In case you just want to test the result of your signed data sent to mocked roll
 ### Create private key and Certificate
 Follow this bash commands to create the certificate and private key pair using openssl and place them in the right directory structure using md5 command (available on mac)
 
+## on Mac
 ```bash
 #1 Create /tmp/certificate.cert and /tmp/private.pem by running:
 openssl req  -nodes -new -x509  -keyout /tmp/private.pem -out /tmp/certificate.cert
 #2 Answer the questions on the command prompt for generating the certificate.
 #3 Save md5 in a variable, by running:
 certificate_md5=$(cat /tmp/certificate.cert | grep -v -- '-----BEGIN CERTIFICATE-----'  | grep -v -- '-----END CERTIFICATE-----' | tr -d '\n'| md5)
+echo $certificate_md5
+#4 Create the <project_dir>/keys/<md5> folder
+mkdir ./keys/$certificate_md5
+#5 Move certificate and private key into <project_dir>/keys/<certificate_md5> folder
+mv /tmp/private.pem /tmp/certificate.cert ./keys/$certificate_md5/
+```
+## on Linux 
+```bash
+#1 Create /tmp/certificate.cert and /tmp/private.pem by running:
+openssl req  -nodes -new -x509  -keyout /tmp/private.pem -out /tmp/certificate.cert
+#2 Answer the questions on the command prompt for generating the certificate.
+#3 Save md5 in a variable, by running:
+certificate_md5=$(cat /tmp/certificate.cert | grep -v -- '-----BEGIN CERTIFICATE-----'  | grep -v -- '-----END CERTIFICATE-----' | tr -d '\n'|  md5sum  | awk '{print $1}')
 echo $certificate_md5
 #4 Create the <project_dir>/keys/<md5> folder
 mkdir ./keys/$certificate_md5
