@@ -119,7 +119,7 @@ certificate_md5=$(cat /tmp/certificate.cert | grep -v -- '-----BEGIN CERTIFICATE
 echo $certificate_md5
 #4 Create the <project_dir>/keys/<md5> folder
 mkdir ./keys/$certificate_md5
-#5 Move ceritificate and private key into <project_dir>/keys/<certificate_md5> folder
+#5 Move certificate and private key into <project_dir>/keys/<certificate_md5> folder
 mv /tmp/private.pem /tmp/certificate.cert ./keys/$certificate_md5/
 ```
 On complete you should have private key in `private.pem` and certificate ready in `certificate.cert`
