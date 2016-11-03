@@ -60,7 +60,7 @@ class Signer {
    * @return {*}
    */
   loadArtifacts(){
-    let privateKeyPath = path.resolve(`./keys/${this.certificateMd5}/private.pem`);
+    let privateKeyPath = path.resolve(__dirname + `/../../keys/${this.certificateMd5}/private.pem`);
     console.log(`Loading private key from ${privateKeyPath}`);
     return q.nfcall(fs.readFile, privateKeyPath, 'utf8')
       .then(privateKeyData => {
