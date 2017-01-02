@@ -20,20 +20,27 @@ Clone Rollout's signer from the following git repository
  - `npm install` to install all dependecies
 
 ### Quick start 
-  Run customer signer:
+Start the signer service:
 
 ```bash 
 $ npm start
 ```
-  Runs Rollout's customer code which is the signing remote service
+
+Verfiy the service responds by sending sign request to the service
  
 ```bash 
-$ node rollout/simulate_rollout_signing_request.js http://localhost:4000/rollout/sign ./keys/535110d5fb598c7a01635d108ab69e54/certificate.cert // or npm run simulate
+$ node rollout/simulate_rollout_signing_request.js http://localhost:4000/rollout/sign ./keys/535110d5fb598c7a01635d108ab69e54/certificate.cert
 ```
 
- Runs Rollout's mock which send sample configuration to remote signing url with the given certificate. 
- You can use it with different signing service implementation by replacing the url and the certificate arguments.
- Make sure to run this script only after the remote signining service is up and running.
+OR
+
+```bash
+npm run simulate
+```
+
+The command creates sample Rollout configuration which is sent to remote signing url with the given certificate.
+You can use it with different signing service implementation by replacing the url and the certificate arguments.
+Make sure to run this script only after the remote signining service is up and running.
 
   Test customer code
 ```bash
