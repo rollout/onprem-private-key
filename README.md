@@ -46,23 +46,23 @@ Make sure to run this script only after the remote signining service is up and r
 ```bash
 $ npm test
 ```
- Test the signing service (e.g. the customer part pf the service)
+ Test the signing service (e.g. the customer part of the service)
  
 ## More on the Signer
-The project is a node.js project that use express as the web framework.
+The project is written in javascript that runs is NodeJS environment and uses `express` web framework.
 
 1. `npm start` is actually run customer/app.js which initiate application variables and modules and start the server (in customer/www/bin)
 1. customer/app.js register a router (entry point) for all requests that will start with `http://<this domain>/rollout`
 1. Entry point (in customer/routes/rollout.js) 
 1. Call for signing configuration send to `http://<this domain>/rollout/sign` with method=`POST` and body is: 
 
-```json
+```javascript
 {
   "data": {
-   //Data that we like to sign with the private key
+    // Data that we like to sign with the private key
   },
-  "certificateMd5": "535110d5fb598c7a01635d108ab69e54", //md5 value generated from running md5 on the certificate registered on rollout dashboard. Ususally act as a key to the private key in a local map.
-  "responseURL": "http://localhost:3000/api/app-versions/:appId/signing_data/:transactionId" //The url which you should send the result too.
+  "certificateMd5": "535110d5fb598c7a01635d108ab69e54", // md5 value generated from running md5 on the certificate registered on rollout dashboard. Ususally act as a key to the private key in a local map.
+  "responseURL": "http://localhost:3000/api/app-versions/:appId/signing_data/:transactionId" // The url which you should send the result too.
 }
 ```
 
