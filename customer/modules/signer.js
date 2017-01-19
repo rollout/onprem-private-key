@@ -1,15 +1,15 @@
-/**
- * Created by kfirerez on 15/08/2016.
- */
 'use strict';
 
 const q = require('q');
-const NodeRSA = require('node-rsa');
 const request = require('request');
 const fs = require('fs');
+const crypto = require('crypto')
 const path = require('path');
 const eventEmitter = require('./roEventEmitter');
 
+const ENCODING = 'utf8';
+const SIGNING_ALGORITHM = 'sha256';
+const SIGNATURE_FORMAT = 'base64';
 /**
  * Signer is responsible to sign configurations according to the information it gets from the request.
  */
@@ -21,6 +21,8 @@ class Signer {
       err.code = 400;
       throw err;
     }
+    this.PRIVATE_KEY_PATH = path.resolve(path.join(__dirname,`/../../keys/${this.certificateMd5}/private.pem`));
+
     this.data = req.body.data;
     this.certificateMd5 = req.body.certificateMd5;
     this.responseURL = req.body.responseURL;
@@ -60,9 +62,8 @@ class Signer {
    * @return {*}
    */
   loadArtifacts(){
-    let privateKeyPath = path.resolve(__dirname + `/../../keys/${this.certificateMd5}/private.pem`);
-    console.log(`Loading private key from ${privateKeyPath}`);
-    return q.nfcall(fs.readFile, privateKeyPath, 'utf8')
+    console.log(`Loading private key from ${this.PRIVATE_KEY_PATH}`);
+    return q.nfcall(fs.readFile, this.PRIVATE_KEY_PATH, 'utf8')
       .then(privateKeyData => {
         this.privateKeyData = privateKeyData;
       })
@@ -85,18 +86,11 @@ class Signer {
   sign() {
     return this.preSignHook()
       .then( () => {
-        console.log(`Creating nodeRSA obj with signingAlgorithm sha256`);
-        let nodeRSAObj = new NodeRSA(this.privateKeyData, {
-          environment: 'node',
-          signingAlgorithm: 'sha256'
-        });
-  
-        try {
-          this.signature = nodeRSAObj.sign(this.data, 'base64');
-          this.sendSignature();
-        } catch (e) {
-          return q.reject(e);
-        }
+        console.log('Signing data...');
+        let signer = crypto.createSign(SIGNING_ALGORITHM);
+        signer.update(this.data, ENCODING);
+        this.signature = signer.sign(this.privateKeyData, SIGNATURE_FORMAT);
+        this.sendSignature();
       })
       .then(this.postSignHook.bind(this));
   }
