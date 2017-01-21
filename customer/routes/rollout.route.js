@@ -1,11 +1,7 @@
-/**
- * Endpoint file for all requests that arrive with prefix "http://<this_domain>/rollout/...
- */
 'use strict';
 
 const express = require('express');
 const router = express.Router();
-const prettyJson = require('prettyjson');
 
 const Signer = require('../modules/signer');
 
@@ -23,36 +19,26 @@ router.post('/sign', (req, res) => {
   let signer = new Signer(req);
   signer.verify()
     .then(signer.loadArtifacts.bind(signer))
-    .then(()=> {
-      //Note that this response is just to tell the caller that request received and validated. The actual signed data will be sent via the responseUrl callback
-      res.status(200).send();
-      console.log(`Received data pending signature at responseURL: ${req.body.responseURL} with certificate (md5): ${req.body.certificateMd5}`);
+    .then(() => {
+      console.log('Received sign request', req.body);
     })
     .then(signer.sign.bind(signer))
-    .catch( err => {
+    .then(() => {
+      // Note that this response is just to tell the caller that request received and validated. The actual signed data will be sent via the responseUrl callback
+      res.status(200).send();
+    })
+    .catch(err => {
       err = err || new Error();
       err.message = err.message || 'Failed to sign configuration';
       err.code = err.code || 400;
-      res.status(err.code).send(err);
-      console.error(`Error while signing configuration. Code= ${err.code}, Message=${err.message}`);
+      res.status(err.code).send(err.message);
+      console.error(`Error while signing configuration. Code=${err.code}, Message=${err.message}`);
     })
     .done();
 });
 
-router.post('/dummyRollout/app-versions/:appId/signing_data/:transactionId', (req, res) => {
-  console.log(prettyJson.render({
-    appId: req.params.appId,
-    transactionId: req.params.transactionId
-  }));
-  console.log(prettyJson.render(req.body));
-  res.status(200).send();
-});
-
-/**
- * Any request that reach here is not authorized and thus rejected with 403.
- */
 router.all('*', (req, res) => {
-  res.status(403).send();
+  res.status(404).send();
 });
 
 module.exports = router;

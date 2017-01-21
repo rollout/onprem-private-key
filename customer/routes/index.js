@@ -1,27 +1,41 @@
 'use strict';
 
-var express = require('express');
-var router = express.Router();
-var markdown = require('markdown-js');
-var fs = require('fs');
-var path = require('path');
-var q = require('q');
+const q = require('q');
+const fs = require('fs');
+const path = require('path');
+const express = require('express');
+// const markdown = require('markdown').markdown;
+const ghm = require('github-flavored-markdown');
+const handlebars = require('hbs').handlebars;
+const rolloutRoutes = require('./rollout.route');
 
-/**
- * Lending page for this tool that represent the README.md
- */
-router.get('/', function(req, res, next) {
-  let p = path.resolve(__dirname + '/../../README.md');
+const router = express.Router();
+const p = path.resolve(path.join(__dirname, '../../README.md'));
+const layout = path.resolve(path.join(__dirname, '../views/layout.hbs'));
+
+router.get('/', function (req, res) {
+  let readme;
+
   q.nfcall(fs.readFile, p, 'utf8')
-    .then( content => {
-      let readme = markdown.makeHtml(content);
-      res.send(readme);
+    .then(content => {
+      readme = ghm.parse(content);
+      return q.nfcall(fs.readFile, layout, 'utf8');
     })
-    .catch(err => {
-      console.error(`Failed to read markdown located in: ${p}`);
+    .then(layout => {
+      var template = handlebars.compile(layout);
+      res.send(template({
+        body: readme,
+        title: 'Rollout.io on-premise sign service README'
+      }));
+    })
+    .catch(error => {
+      console.error(`Failed to read markdown located in: ${p}`, error);
       res.status(500).send('Failed to read README.md');
     })
     .done();
 });
+
+// All requests with prefix 'http://<this domain>/rollout/' will route to module rolloutRoutes for further processing.
+router.use('/rollout', rolloutRoutes);
 
 module.exports = router;
