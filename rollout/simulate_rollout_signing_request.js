@@ -1,16 +1,9 @@
-/**
- * Created by kfirerez on 23/08/2016.
- */
 'use strict';
-
-const q = require('q');
-const express = require('express');
-const cookieParser = require('cookie-parser');
-const bodyParser = require('body-parser');
-const NodeRSA = require('node-rsa');
+const rolloutServer = require('./rolloutServer');
 const RolloutMock = require('./rolloutMock');
+const rp = require('request-promise-native');
 
-const signingEndpoint = process.argv[2];
+const signServiceURL = process.argv[2];
 const certificateFilePath = process.argv[3];
 
 if (process.argv.length !== 4) {
@@ -19,52 +12,45 @@ if (process.argv.length !== 4) {
     certificate_file - path to public certificate `);
   process.exit(1);
 } else {
-  console.log(`Running Rollout mock with signing url: "${signingEndpoint}"
-   path to certificate: "${certificateFilePath}"`)
+  console.log(`* Checking signing service at "${signServiceURL}" using certificate: "${certificateFilePath}"`);
 }
 
-const app = express();
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
-
-var rolloutMock = new RolloutMock(signingEndpoint, certificateFilePath);
-
-
-
 /**
- * This is the routes that is used as the responseURL in this demo.
- * The remote signer must send the signed configuration to this endpoint.
+ * The script creates an express server and sends sign request to the sign service,
+ * which is expected to run on port 4000, it waits for response from the service and\
+ * validates it.
+ *
+ * This flow is what Rollout servers do when using on-premise sign services installed and maintaned
+ * by Rollout's customers
  */
-app.post('/api/app-versions/12345678/signing_data/987654', function (req, res) {
-  console.log(`Got response from remote signer`);
-  let key = new NodeRSA(rolloutMock.publicKeyData, {
-    environment: 'node',
-    signingAlgorithm: 'sha256'
-  });
-  
-  //Note that we are verifing the signature with the raw data we have sent.
-  if(key.verify(rolloutMock.body.data, req.body.signature, 'base64', 'base64')){
-    console.log(`Succsesfully verified signature: \n ${req.body.signature} on data sent to signer`);
-    res.status(200).send();
+
+const rollout = new RolloutMock(certificateFilePath);
+const handleSignerResponse = function (req, res) {
+  const signature = req.body.signature;
+
+  return rollout.verifySignature(signature)
+  .then(result => {
+    if (!result) {
+      res.status(500);
+      console.error(`❌  Failed to verify response from sign service with, signature: ${signature}`);
+      process.exit(1);
+    }
+    res.sendStatus(200);
+    console.error('🎉  Sign service operates correctly!');
     process.exit(0);
-  } else {
-    console.log(` ailed to verify signature: \n${req.body.signature} on data sent to signer`);
-    res.status(400).send();
-    process.exit(1);
-  }
-});
+  });
+};
 
-/**
- * Rollout mock server listens on port 3000
- */
-app.listen(3000, function () {
-  console.log('Response URL endpoint mimics Rollout is up and listening on port 3000!');
-  q.resolve()
-    .then(rolloutMock.initArtifacts.bind(rolloutMock))
-    .then(rolloutMock.sendConfigurationToSigningService.bind(rolloutMock))
-    .then(() => {
-      console.log('Hot patch data sent for signing. Waiting for response from signing service...');
-    })
-    .done();
-});
+rolloutServer.init({ handleSignerResponse })
+  .then(() => rolloutServer.start())
+  .then(() => rp({
+    uri: signServiceURL,
+    method: 'POST',
+    json: true,
+    body: rollout.getDataForSigning(),
+    rejectUnauthorized: false
+  }))
+  .catch(error => {
+    console.error(error.toString());
+    process.exit(1);
+  });
